@@ -1,8 +1,8 @@
 import pyglet
-from pypeliner.actors import Node
-from pypeliner.actors.node import Bounds, Point
-from pypeliner.tasks import Task
-from pypeliner.util import get_in_connection, get_out_connection
+from pipeliner.actors import Node
+from pipeliner.actors.node import Bounds, Point
+from pipeliner.tasks import Task
+from pipeliner.util import get_in_connection, get_out_connection
 
 class Artist(Node):
 

@@ -1,4 +1,4 @@
-from pypeliner.actors import Node
+from pipeliner.actors import Node
 from pyglet.shapes import Line
 
 

@@ -2,10 +2,10 @@ from abc import ABC
 
 from pyglet.shapes import BorderedRectangle
 
-from pypeliner.actors.node import Node
-from pypeliner.tasks.state import TaskState
-from pypeliner.tasks.status import TaskStatus
-from pypeliner.tasks.type import TaskType
+from pipeliner.actors.node import Node
+from pipeliner.tasks.state import TaskState
+from pipeliner.tasks.status import TaskStatus
+from pipeliner.tasks.type import TaskType
 
 
 class Task(ABC):

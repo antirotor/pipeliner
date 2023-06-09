@@ -5,7 +5,7 @@ from pyglet.graphics import Batch
 from pyglet.shapes import Circle, Polygon
 from pyglet.text import Label
 from typing import List, Tuple, Optional
-from pypeliner.actors.node import Bounds, Point
+from pipeliner.actors.node import Bounds, Point
 
 
 def get_in_connection(
