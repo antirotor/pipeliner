@@ -1,5 +1,6 @@
 from pipeliner.actors import Node
-from pyglet.shapes import Line
+from pyglet.shapes import Line, Triangle
+import math
 
 
 class Connection(object):
@@ -34,7 +35,6 @@ class Connection(object):
             print(self._shapes)
             raise e
 
-
     def update(self, delta_time: float):
         """
         self._shapes = [
@@ -49,11 +49,21 @@ class Connection(object):
                 self.target.in_port_position.x, self.target.in_port_position.y,
                 color=(50, 225, 30))
 
-
     def get_arrow(self, x1: int, y1: int, x2: int, y2: int, color):
+        
+        arrow_size=10
+
+        # calculate angle between line and x-axis
+        angle = math.atan2(y2 - y1, x2 - x1)
+
+        # calculate arrow points
+        arrow_x1 = x2 - arrow_size * math.cos(angle - math.pi/6)
+        arrow_y1 = y2 - arrow_size * math.sin(angle - math.pi/6)
+        arrow_x2 = x2 - arrow_size * math.cos(angle + math.pi/6)
+        arrow_y2 = y2 - arrow_size * math.sin(angle + math.pi/6)
+        
         return [
             Line(x=x1, y=y1, x2=x2, y2=y2, color=color, batch=self.batch),
             # draw arrow head
-            Line(x=x2, y=y2, x2=x2 - 5, y2=y2 - 5, color=color, batch=self.batch),
-            Line(x=x2, y=y2, x2=x2 - 5, y2=y2 + 5, color=color, batch=self.batch),
+            Triangle(arrow_x1, arrow_y1, x2, y2, arrow_x2, arrow_y2, color=color, batch=self.batch),
         ]
