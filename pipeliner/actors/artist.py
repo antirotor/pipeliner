@@ -2,9 +2,20 @@ import pyglet
 from pipeliner.actors import Node
 from pipeliner.actors.node import Bounds, Point
 from pipeliner.tasks import EmptyTask, Task
+from pipeliner.tasks.type import (
+    EmptyTaskType,
+    CompositingTaskType,
+    RenderingTaskType,
+    ModelingTaskType,
+    RotoscopingTaskType,
+)
+
 from pipeliner.util import get_in_connection, get_out_connection
+from pipeliner.constants import ARTIST_DEFAULT_TASK_SLOTS, ARTIST_DEFAULT_WORK_HOURS
+
 
 class Artist(Node):
+    """Generalist Artist node that can do any task."""
 
     def get_bounds(self) -> Bounds:
         return Bounds(self.x, self.y, self.x + self._square_size, self.y + self._square_size)
@@ -15,13 +26,29 @@ class Artist(Node):
         super().__init__(batch, level, x, y, state)
         self.color = (128, 200, 128, 255)
         self.name = f"A"
+        
+        self.work_hours = ARTIST_DEFAULT_WORK_HOURS
+        self.current_hour = 0
+
+        self.task_slots = ARTIST_DEFAULT_TASK_SLOTS
+        self.accept_types = {
+            EmptyTaskType, CompositingTaskType, RenderingTaskType,
+            ModelingTaskType, RotoscopingTaskType
+        }
+        
+        self.provide_types = {
+            EmptyTaskType, CompositingTaskType, RenderingTaskType,
+            ModelingTaskType, RotoscopingTaskType
+        }
+
         self._square_size = 64
         self._left_pad = 10
         self._right_pad = 10
         self._line_width = 4
         self._background_color = (0, 0, 0, 255)
-        self.current_hour = 4
+        
         self._current_task = EmptyTask(batch, assignee=self)
+
         self.in_port_position_bound = Bounds(0, 0, 0, 0)
         self.out_port_position_bound = Bounds(0, 0, 0, 0)
 

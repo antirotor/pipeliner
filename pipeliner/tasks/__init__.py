@@ -3,7 +3,7 @@ from .status import (
     ApprovedStatus, DoneStatus, InProgressStatus, NotReadyStatus, ReadyStatus,
     RejectedStatus, ReviewStatus)
 from .type import CompositingTaskType, ModelingTaskType, RenderingTaskType, RotoscopingTaskType, EmptyTaskType
-from .task import Task, EmptyTask
+from .task import Task, EmptyTask, CompositingTask
 
 __all__ = [
     "NotStartedState",
@@ -26,5 +26,6 @@ __all__ = [
     "EmptyTaskType",
 
     "EmptyTask",
+    "CompositingTask",
     "Task"
 ]

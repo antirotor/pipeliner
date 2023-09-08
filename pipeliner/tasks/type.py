@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List
+from pipeliner.constants import TASK_SIZE
 
 from pyglet.graphics import Batch
 from pyglet.shapes import ShapeBase
@@ -10,19 +11,15 @@ class TaskType(ABC):
     name: str
     color: tuple
 
-    @abstractmethod
     def get_shapes(self, x: int, y: int, batch: Batch) -> List[ShapeBase]:
-        return []
+        return [
+            Rectangle(x, y, TASK_SIZE, TASK_SIZE, color=self.color, batch=batch),
+        ]
 
 class EmptyTaskType(TaskType):
     def __init__(self):
         self.name = "Empty"
         self.color = (32, 32, 32)
-
-    def get_shapes(self, x: int, y: int, batch: Batch) -> List[ShapeBase]:
-        return [
-            Rectangle(x, y, 5, 5, color=self.color, batch=batch),
-        ]
 
 class CompositingTaskType(TaskType):
     def __init__(self):

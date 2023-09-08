@@ -25,37 +25,22 @@ from pipeliner.tasks.status import (
 from pipeliner.tasks.type import (
     TaskType,
     EmptyTaskType,
+    CompositingTaskType
 )
 
 
 class Task(ABC):
-    type: TaskType
-    state: TaskState
-    status: TaskStatus
+    type: TaskType = EmptyTaskType()
+    state: TaskState = NotStartedState()
+    status: TaskStatus = NotReadyStatus()
     name: str
     id: int
     assignee: Node
     progress: float
+    difficulty: float
+    
 
     _batch: Batch
-
-    @abstractmethod
-    def get_shapes(self) -> List[ShapeBase]:
-        return []
-
-
-class EmptyTask(Task):
-    def __init__(self, batch: Batch, name: str = "Empty", assignee: Node = None):
-        self.type = EmptyTaskType()
-        self.state = InProgressState
-        self.status = ReadyStatus
-        self.name = name
-        self.id = 0
-        self.assignee = assignee
-        self.progress = 0.0
-        
-        self._batch = batch
-
 
     def get_shapes(self, x: int, y: int) -> List[ShapeBase]:
         """Get the shapes that represent this task.
@@ -74,7 +59,31 @@ class EmptyTask(Task):
             List[ShapeBase]: List of shapes that represent this task.
 
         """
-        shapes = super().get_shapes()
+        shapes = []
         shapes += self.type.get_shapes(x, y, self._batch)
+        shapes += self.state.get_shapes(x, y, self._batch)
+        # shapes += self.status.get_shapes(x, y, self._batch)
         return shapes
+
+
+class EmptyTask(Task):
+    def __init__(self, batch: Batch, name: str = "Empty", assignee: Node = None):
+        self.name = name
+        self.id = 0
+        self.assignee = assignee
+        self.progress = 0.0
+        
+        self._batch = batch
+
+class CompositingTask(Task):
+    def __init__(self, batch: Batch, name: str = "Compositing", assignee: Node = None):
+        self.type = CompositingTaskType()
+        self.name = name
+        self.id = 1
+        self.assignee = assignee
+        self.progress = 0.0
+        
+        self._batch = batch
+
+    
     
