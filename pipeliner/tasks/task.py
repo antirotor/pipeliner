@@ -76,6 +76,13 @@ class Task(ABC):
 
     _batch: Batch
 
+    def __init__(self, batch: Batch, name: str = "Empty", assignee: Node = None):
+        self.name = name
+        self.assignee = assignee
+        self.progress = 0.0
+        self._batch = batch
+
+
     def get_shapes(self, x: int, y: int) -> List[ShapeBase]:
         """Get the shapes that represent this task.
         
