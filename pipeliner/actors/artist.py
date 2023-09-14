@@ -1,3 +1,10 @@
+"""Artist node that can do any task.
+
+Artist is a basic workhorse of the game, it can do any task. It has a limited
+number of task slots and can only work for a limited number of hours per day.
+It is rendered as a green square with a letter A in it.
+
+"""
 import pyglet
 from pipeliner.actors import Node
 from pipeliner.actors.node import Bounds, Point
@@ -22,8 +29,8 @@ class Artist(Node):
 
     def __init__(
             self, batch: pyglet.graphics.Batch,
-            level: int = 1, x: int = 0, y: int = 0, state: int = 0):
-        super().__init__(batch, level, x, y, state)
+            level: int = 1, x: int = 0, y: int = 0):
+        super().__init__(batch, level, x, y)
         self.color = (128, 200, 128, 255)
         self.name = f"A"
         
@@ -56,12 +63,22 @@ class Artist(Node):
         self.out_port_position: Point = Point(0, 0)
 
 
-    def level_up(self):
+    def level_up(self) -> None:
+        """Level up the node.
+        
+        This method calculates the new production rate and work hours
+        for the node.
+
+        Todo:
+            This method should be moved to the base class.
+
+        """
         self.level += 1
         self.production_rate += 0.5
         self.work_hours += 1
 
     def _get_main_square(self):
+        """Draw the main square of the node."""
 
         shapes = [
             pyglet.shapes.BorderedRectangle(
@@ -105,6 +122,12 @@ class Artist(Node):
         return shapes
 
     def _get_work_hours_bar(self):
+        """Draw the work hours bar.
+        
+        This is the leftmost bar in the node. It shows how many hours
+        the node has worked today.
+
+        """
         hour_step = (self._square_size - 2) / self.work_hours
         bar_height = self.current_hour * hour_step
         if self.current_hour >= self.work_hours:
@@ -124,6 +147,14 @@ class Artist(Node):
         ]
 
     def _get_io_load_indicator(self):
+        """Draw the load indicator.
+        
+        Load indicator is drawn on the background of the main square.
+        It shows how many tasks the node has in its task slots.
+
+        Todo:
+            implement this method properly. Currently it is only static.
+        """
         return [
             pyglet.shapes.Rectangle(
                 x=self.x + self._left_pad + 4,
@@ -134,7 +165,17 @@ class Artist(Node):
                 batch=self.batch),
         ]
 
-    def _get_task_progress_bar(self, task: Task):
+    def _get_task_progress_bar(self, task: Task) -> None:
+        """Draw the task progress bar.
+
+        This is the bar on the bottom above the Task View
+        that shows how much progress the current task
+        has made.
+
+        Args:
+            task (Task): Task to draw the progress bar for.
+
+        """
         x = self.x + self._left_pad
         y = self.y - 7
         return [
@@ -154,6 +195,7 @@ class Artist(Node):
         ]
 
     def draw(self):
+        """Draw the node."""
         shapes = []
         shapes += self._get_main_square()
         shapes += self._get_work_hours_bar()
@@ -164,11 +206,16 @@ class Artist(Node):
             shape.draw()
 
     def update(self, delta_time: float):
+        """Update the node.
+
+        Args:
+            delta_time (float): Time since last update.
+
+        """
         self.current_hour += delta_time
         if self.current_hour >= self.work_hours:
             self.current_hour = 0
             self.state = 0
             self.color = (128, 200, 128, 255)
-            # self.tasks = []
         for connection in self.connections:
             connection.update(delta_time)

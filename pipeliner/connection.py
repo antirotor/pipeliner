@@ -1,6 +1,8 @@
+"""Class for connection between two nodes"""
 from pipeliner.actors import Node
-from pyglet.shapes import Line, Triangle
+from pyglet.shapes import Line, Triangle, ShapeBase
 import math
+from typing import List
 
 
 class Connection(object):
@@ -36,21 +38,25 @@ class Connection(object):
             raise e
 
     def update(self, delta_time: float):
-        """
-        self._shapes = [
-            Line(self.source.out_port_position.x, self.source.out_port_position.y,
-                 self.target.in_port_position.x, self.target.in_port_position.y,
-                 2, color=(50, 225, 30), batch=self.batch)
-        ]
-        """
-
         self._shapes = self.get_arrow(
                 self.source.out_port_position.x, self.source.out_port_position.y,
                 self.target.in_port_position.x, self.target.in_port_position.y,
                 color=(50, 225, 30))
 
-    def get_arrow(self, x1: int, y1: int, x2: int, y2: int, color):
+    def get_arrow(self, x1: int, y1: int, x2: int, y2: int, color) -> List[ShapeBase]:
+        """Get shapes for end pointing arrow.
         
+        Args:
+            x1 (int): x coordinate of start point
+            y1 (int): y coordinate of start point
+            x2 (int): x coordinate of end point
+            y2 (int): y coordinate of end point
+            color (tuple): color of arrow
+
+        Returns:
+            List[ShapeBase]: list of shapes for arrow
+
+        """
         arrow_size=10
 
         # calculate angle between line and x-axis

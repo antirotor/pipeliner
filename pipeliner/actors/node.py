@@ -1,3 +1,4 @@
+"""Base for all nodes/actors in the game."""
 import pyglet
 from pipeliner.constants import TASK_SIZE, TASK_PADDING
 from abc import ABC, abstractmethod
@@ -7,12 +8,28 @@ from dataclasses import dataclass
 
 @dataclass
 class Bounds:
+    """Bounds of a rectangle.
+    
+    It includes drawing methods for debugging.
+    """
     x1: int
     y1: int
     x2: int
     y2: int
 
     def get_shapes(self, color: tuple, batch: pyglet.graphics.Batch) -> List:
+        """Get bounds shapes as lines.
+        
+        This is used for debugging purposes to draw the bounds.
+
+        Args:
+            color (tuple): Color of the bounds.
+            batch (pyglet.graphics.Batch): Batch to add the shapes to.
+
+        Returns:
+            List: List of shapes.
+
+        """
         return [
             pyglet.shapes.Line(x=self.x1, y=self.y1, x2=self.x1, y2=self.y2, color=color, batch=batch),
             pyglet.shapes.Line(x=self.x1, y=self.y2, x2=self.x2, y2=self.y2, color=color, batch=batch),
@@ -32,34 +49,60 @@ class Point:
 
 
 class Node(ABC):
-    level: int
-    batch: pyglet.graphics.Batch
+    """Base class for all nodes/actors in the game.
+    
+    Properties:
+        
+        x (int): X position of the node.
+        y (int): Y position of the node.
+        color (tuple): Color of the node.
+        
+        connections (List[Connection]): List of connections to other nodes.
+        accept_types (Set): Set of task types that the node accepts.
+        provide_types (Set): Set of task types that the node provides.
+
+        level (int): Level of the node.
+        production_rate (float): How many tasks the node produces per hour.
+        work_hours (int): How many hours the node works per day.
+        current_hour (int): Current hour in the working day of the node.
+
+        _in_port_position_bound (Optional[Bounds]): Bounds of the in port position.
+        _out_port_position_bound (Optional[Bounds]): Bounds of the out port position.
+        _in_port_position (Point): Position of the in port.
+        _out_port_position (Point): Position of the out port.
+        
+        _batch (pyglet.graphics.Batch): Batch to add the shapes to.
+
+    """
     x: int
     y: int
-    state: int
+    color: tuple
+
     connections: List
+    accept_types: Set
+    provide_types: Set
+    
+    level: int
     production_rate: float
     work_hours: int
     current_hour: int
-    color: tuple
-    in_port_position_bound: Optional[Bounds]
-    out_port_position_bound: Optional[Bounds]
-    in_port_position: Point
-    out_port_position: Point
-    accept_types: Set
-    provide_types: Set
+    
+    _in_port_position_bound: Optional[Bounds]
+    _out_port_position_bound: Optional[Bounds]
+    _in_port_position: Point
+    _out_port_position: Point
+
+    _batch: pyglet.graphics.Batch
 
     def __init__(self,
                  batch: pyglet.graphics.Batch,
                  level: int = 1,
                  x: int = 0,
-                 y: int = 0,
-                 state: int = 0):
+                 y: int = 0):
         self.level = level
         self.batch = batch
         self.x = x
         self.y = y
-        self.state = state
         self.connections = []
         self.production_rate = 1.0
         self.work_hours = 8
@@ -72,11 +115,18 @@ class Node(ABC):
 
     @abstractmethod
     def update(self, delta_time: float):
+        """Update the node."""
         for connection in self.connections:
             connection.update(delta_time)
 
     @abstractmethod
     def get_bounds(self) -> Bounds:
+        """Get bounds of the node.
+        
+        Returns:
+            Bounds: Bounds of the node.
+        
+        """
         pass
 
     def add_task(self, task) -> bool:
@@ -99,11 +149,42 @@ class Node(ABC):
         self._tasks.append(task)
         return True
     
-    def add_tasks(self, tasks: List) -> bool:
-        for t in tasks:
-            self.add_task(t)
+    def add_tasks(self, tasks: List) -> List[bool]:
+        """Add multiple tasks to the node.
+        
+        Args:
+            tasks (List): List of tasks to add.
 
-    def get_task_view(self, offset_x: int = 0, offset_y: int = 0, max_length: int = 64) -> List:
+        Returns:
+            List[bool]: List of booleans indicating if the task was added.
+
+        """
+        results = []
+        for t in tasks:
+            results.append(self.add_task(t))
+
+        return results
+
+    def get_task_view(
+            self,
+            offset_x: int = 0,
+            offset_y: int = 0,
+            max_length: int = 64) -> List[pyglet.shapes.ShapeBase]:
+        """Get shapes for the node's task view.
+        
+        Task view is a visual representation of the tasks and their
+        state associated with the node. Task shapes are drawn in a grid
+        with a maximum length of max_length.
+
+        Args:
+            offset_x (int, optional): X offset of the task view. Defaults to 0.
+            offset_y (int, optional): Y offset of the task view. Defaults to 0.
+            max_length (int, optional): Maximum length of the task view. Defaults to 64.
+
+        Returns:
+            List: List of shapes.
+
+        """
         x = self.x + offset_x
         y = self.y + offset_y
         shapes = []

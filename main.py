@@ -10,7 +10,7 @@ from pipeliner.actors import Artist
 from pipeliner.connection import Connection
 from pipeliner.tasks import (
     EmptyTask,
-    CompositingTask
+    SimpleCompositingTask
 )
 
 
@@ -42,7 +42,7 @@ actors = [
 
 actors[0].task_slots = 10
 actors[0].add_tasks([EmptyTask(main_batch, assignee=actors[0]) for _ in range(5)])
-actors[0].add_task(CompositingTask(main_batch, assignee=actors[0]))
+actors[0].add_task(SimpleCompositingTask(main_batch, assignee=actors[0]))
 
 score_label = pyglet.text.Label(text="Score: 0", x=10, y=window.height - 20)
 
